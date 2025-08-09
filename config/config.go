@@ -8,6 +8,7 @@ type Config struct {
 	LoggerConfig   LoggerConfig
 	TelegramConfig TelegramConfig
 	PostgresConfig PostgresConfig
+	MarkovConfig   MarkovConfig
 }
 
 func Load() (*Config, error) {
