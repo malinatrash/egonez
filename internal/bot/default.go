@@ -10,6 +10,7 @@ import (
 )
 
 func (h *Handler) defaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
+	h.logger.Warn("default handler")
 
 	if update.Message.BoostAdded != nil {
 		h.logger.Info("Boost added")

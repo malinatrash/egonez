@@ -43,7 +43,7 @@ func NewHandler(config *config.Config, service *usecase.Service, logger *zap.Log
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/clear", bot.MatchTypeExact, h.handleClear)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/sticker", bot.MatchTypeExact, h.handleSticker)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/stats", bot.MatchTypeExact, h.handleStats)
-	b.RegisterHandler(bot.HandlerTypeMessageText, "", bot.MatchTypeContains, h.handleTextMessage)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "", bot.MatchTypeContains, h.handleTextMessage, h.Middleware)
 
 	return h, nil
 }
