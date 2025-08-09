@@ -51,7 +51,7 @@ func (s *botService) GenerateResponse(ctx context.Context, chatID int64) (string
 		return "", fmt.Errorf("failed to load messages: %w", err)
 	}
 
-	response, err := s.markovService.Generate(chatID, "", 20) // Generate up to 20 words
+	response, err := s.markovService.Generate(chatID, "", 50) // Generate up to 50 words
 	if err != nil {
 		if err.Error() == "no data available for generation" {
 			return "I don't have enough data to generate a response yet. Send me some messages first!", nil
@@ -79,6 +79,18 @@ func (s *botService) GetRandomSticker(ctx context.Context, chatID int64) (*entit
 	}
 
 	return sticker, nil
+}
+
+func (s *botService) HandleSticker(ctx context.Context, chatID, userID int64, fileID, setName string) error {
+	// Create a new sticker entity
+	sticker := &entity.Sticker{
+		ChatID:  chatID,
+		FileID:  fileID,
+		SetName: setName,
+	}
+
+	// Save the sticker to the database
+	return s.stickerRepo.Create(ctx, sticker)
 }
 
 func (s *botService) GetChatStats(ctx context.Context, chatID int64) (*entity.ChatStats, error) {

@@ -30,10 +30,11 @@ func (r *Sticker) Create(ctx context.Context, sticker *entity.Sticker) error {
 func (r *Sticker) GetRandom(ctx context.Context, chatID int64) (*entity.Sticker, error) {
 	var sticker entity.Sticker
 
+	// For PostgreSQL, we use ORDER BY RANDOM()
 	err := r.db.NewSelect().
 		Model(&sticker).
 		Where("chat_id = ?", chatID).
-		Order("RANDOM()").
+		OrderExpr("RANDOM()"). // Use OrderExpr to ensure the function is passed as-is
 		Limit(1).
 		Scan(ctx)
 

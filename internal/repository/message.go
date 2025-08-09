@@ -73,3 +73,19 @@ func (r *Message) GetRandom(ctx context.Context, chatID int64) (*entity.Message,
 
 	return &message, nil
 }
+
+func (r *Message) GetAllChatIDs(ctx context.Context) ([]int64, error) {
+	var chatIDs []int64
+	
+	err := r.db.NewSelect().
+		Model((*entity.Message)(nil)).
+		ColumnExpr("DISTINCT chat_id").
+		Order("chat_id").
+		Scan(ctx, &chatIDs)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return chatIDs, nil
+}
