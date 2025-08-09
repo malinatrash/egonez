@@ -8,6 +8,7 @@ import (
 
 	"github.com/malinatrash/egonez/config"
 	"github.com/malinatrash/egonez/internal/entity"
+	"go.uber.org/zap"
 
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
@@ -15,7 +16,7 @@ import (
 	"github.com/uptrace/bun/extra/bundebug"
 )
 
-func NewDatabase(cfg *config.Config) (*bun.DB, error) {
+func NewDatabase(logger *zap.Logger, cfg *config.Config) (*bun.DB, error) {
 	sqldb := sql.OpenDB(pgdriver.NewConnector(
 		pgdriver.WithAddr(fmt.Sprintf("%s:%d", cfg.PostgresConfig.Host, cfg.PostgresConfig.Port)),
 		pgdriver.WithUser(cfg.PostgresConfig.User),
@@ -45,10 +46,19 @@ func NewDatabase(cfg *config.Config) (*bun.DB, error) {
 	}
 
 	if _, err := db.NewCreateTable().Model((*entity.Message)(nil)).Exec(ctx); err != nil {
+		logger.Error("failed to create table", zap.Error(err))
+	} else {
+		logger.Warn("table MESSAGES created")
 	}
 	if _, err := db.NewCreateTable().Model((*entity.Sticker)(nil)).Exec(ctx); err != nil {
+		logger.Error("failed to create table", zap.Error(err))
+	} else {
+		logger.Warn("table STICKERS created")
 	}
 	if _, err := db.NewCreateTable().Model((*entity.ChatStats)(nil)).Exec(ctx); err != nil {
+		logger.Error("failed to create table", zap.Error(err))
+	} else {
+		logger.Warn("table CHAT_STATS created")
 	}
 
 	return db, nil

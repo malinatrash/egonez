@@ -12,8 +12,8 @@ func New() *fx.App {
 	return fx.New(
 		fx.Provide(
 			config.Load,
-			NewDatabase,
 			newLogger,
+			NewDatabase,
 			repository.NewRepository,
 			usecase.NewService,
 			bot.NewHandler,
