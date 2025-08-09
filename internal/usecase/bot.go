@@ -7,21 +7,22 @@ import (
 
 	"github.com/malinatrash/egonez/internal/entity"
 	"github.com/malinatrash/egonez/internal/ports"
+	"github.com/malinatrash/egonez/internal/usecase/adapters"
 )
 
-var _ Bot = (*botService)(nil)
+var _ adapters.Bot = (*botService)(nil)
 
 type botService struct {
 	messageRepo   ports.MessageRepository
 	stickerRepo   ports.StickerRepository
-	markovService Markov
+	markovService adapters.Markov
 }
 
 func NewBotService(
 	msgRepo ports.MessageRepository,
 	stickerRepo ports.StickerRepository,
-	markovSvc Markov,
-) Bot {
+	markovSvc adapters.Markov,
+) adapters.Bot {
 	return &botService{
 		messageRepo:   msgRepo,
 		stickerRepo:   stickerRepo,

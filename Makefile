@@ -13,7 +13,7 @@ test:
 
 # Build the application
 build:
-	go build -o bin/egonez ./cmd/bot
+	go build -o tmp/main ./cmd/bot
 
 # Run the application
 run:

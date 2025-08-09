@@ -48,7 +48,6 @@ func (s *Service) Generate(chatID int64, prefix string, maxLength int) (string, 
 
 	tokens := strings.Fields(prefix)
 	if len(tokens) == 0 {
-
 		token, err := s.getRandomToken(chatID)
 		if err != nil {
 			return "", fmt.Errorf("failed to get random token: %w", err)
@@ -56,12 +55,29 @@ func (s *Service) Generate(chatID int64, prefix string, maxLength int) (string, 
 		tokens = []string{token}
 	}
 
-	result := tokens
-	for i := 0; i < maxLength; i++ {
-		next, err := chain.Generate(tokens)
-		if err != nil || next == "" {
+	for len(tokens) < chain.Order {
+		token, err := s.getRandomToken(chatID)
+		if err != nil {
 			break
 		}
+		tokens = append(tokens, token)
+	}
+
+	result := make([]string, len(tokens))
+	copy(result, tokens)
+
+	for i := 0; i < maxLength; i++ {
+
+		currentTokens := tokens
+		if len(currentTokens) > chain.Order {
+			currentTokens = currentTokens[len(currentTokens)-chain.Order:]
+		}
+
+		next, err := chain.Generate(currentTokens)
+		if err != nil || next == "" || next == gomarkov.EndToken {
+			break
+		}
+
 		result = append(result, next)
 		tokens = append(tokens[1:], next)
 	}
@@ -120,5 +136,20 @@ func (s *Service) getRandomToken(chatID int64) (string, error) {
 		return "", fmt.Errorf("no chain available")
 	}
 
-	return "I", nil
+	startState := make(gomarkov.NGram, chain.Order)
+	for i := 0; i < chain.Order; i++ {
+		startState[i] = gomarkov.StartToken
+	}
+
+	token, err := chain.Generate(startState)
+	if err != nil {
+		s.logg.Error("failed to generate token", zap.Error(err))
+		return "", fmt.Errorf("failed to generate token: %w", err)
+	}
+
+	if token == gomarkov.EndToken {
+		return s.getRandomToken(chatID)
+	}
+
+	return token, nil
 }

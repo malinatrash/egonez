@@ -19,8 +19,7 @@ services:
       - DB_PASSWORD=postgres
       - DB_NAME=egonez
       - DB_SSLMODE=disable
-    volumes:
-      - .:/app
+
     networks:
       - egonez-network
 
@@ -33,22 +32,9 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=egonez
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - egonez-network
-
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: egonez-pgadmin
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@example.com
-      - PGADMIN_DEFAULT_PASSWORD=admin
-    ports:
-      - "5050:80"
-    depends_on:
-      - postgres
     networks:
       - egonez-network
 

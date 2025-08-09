@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/malinatrash/egonez/config"
+	"github.com/malinatrash/egonez/internal/entity"
 
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
@@ -41,6 +42,13 @@ func NewDatabase(cfg *config.Config) (*bun.DB, error) {
 
 	if err := db.PingContext(ctx); err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	if _, err := db.NewCreateTable().Model((*entity.Message)(nil)).Exec(ctx); err != nil {
+	}
+	if _, err := db.NewCreateTable().Model((*entity.Sticker)(nil)).Exec(ctx); err != nil {
+	}
+	if _, err := db.NewCreateTable().Model((*entity.ChatStats)(nil)).Exec(ctx); err != nil {
 	}
 
 	return db, nil

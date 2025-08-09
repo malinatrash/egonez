@@ -1,0 +1,14 @@
+tmp_dir = "tmp"
+root = "."
+
+[color]
+  main = "yellow"
+  watcher = "cyan"
+  build = "green"
+  runner = "magenta"
+
+[build]
+  cmd = "go build -ldflags='-s -w' -o tmp/main ./cmd/bot"
+  include_ext = ["go"]
+  exclude_dir = ["tmp", "vendor"]
+  bin = "tmp/main"

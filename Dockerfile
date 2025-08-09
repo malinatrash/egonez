@@ -1,39 +1,35 @@
+# syntax=docker/dockerfile:1.7
+
 # Build stage
-FROM golang:1.21-alpine AS builder
+FROM golang:1.24 AS builder
 
 WORKDIR /app
 
-# Install dependencies
-RUN apk add --no-cache git
-
-# Copy go mod and sum files
+# Copy go mod files
 COPY go.mod go.sum ./
 
-# Download all dependencies
+# Download dependencies
 RUN go mod download
 
-# Copy the source code
+# Copy source code
 COPY . .
 
-# Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -o /egonez ./cmd/bot
+# Build the application for Linux
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /app/egonez ./cmd/bot
 
 # Final stage
 FROM alpine:latest
 
 WORKDIR /app
 
-# Install CA certificates
+# Install runtime dependencies
 RUN apk --no-cache add ca-certificates tzdata
 
 # Copy the binary from builder
-COPY --from=builder /egonez .
+COPY --from=builder /app/egonez .
 
-# Copy configuration files
-COPY .env.example .env
+# Make the binary executable
+RUN chmod +x egonez
 
-# Expose port (if needed)
-# EXPOSE 8080
-
-# Command to run the executable
-CMD ["./egonez"]
+# Set the entrypoint
+ENTRYPOINT ["/app/egonez"]
