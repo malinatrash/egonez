@@ -11,7 +11,7 @@ type Sticker struct {
 
 	ID        int64     `bun:"id,pk,autoincrement" json:"id"`
 	ChatID    int64     `bun:"chat_id,notnull" json:"chat_id"`
-	FileID    string    `bun:"file_id,notnull" json:"file_id"`
+	FileID    string    `bun:"file_id,notnull,unique" json:"file_id"`
 	SetName   string    `bun:"set_name" json:"set_name"`
 	CreatedAt time.Time `bun:"created_at,notnull,default:now()" json:"created_at"`
 }
