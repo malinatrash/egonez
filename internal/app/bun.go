@@ -16,6 +16,12 @@ import (
 	"github.com/uptrace/bun/extra/bundebug"
 )
 
+var tables = []interface{}{
+	(*entity.Message)(nil),
+	(*entity.Sticker)(nil),
+	(*entity.ChatStats)(nil),
+}
+
 func NewDatabase(logger *zap.Logger, cfg *config.Config) (*bun.DB, error) {
 	sqldb := sql.OpenDB(pgdriver.NewConnector(
 		pgdriver.WithAddr(fmt.Sprintf("%s:%d", cfg.PostgresConfig.Host, cfg.PostgresConfig.Port)),
@@ -45,20 +51,12 @@ func NewDatabase(logger *zap.Logger, cfg *config.Config) (*bun.DB, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	if _, err := db.NewCreateTable().Model((*entity.Message)(nil)).Exec(ctx); err != nil {
-		logger.Error("failed to create table", zap.Error(err))
-	} else {
-		logger.Warn("table MESSAGES created")
-	}
-	if _, err := db.NewCreateTable().Model((*entity.Sticker)(nil)).Exec(ctx); err != nil {
-		logger.Error("failed to create table", zap.Error(err))
-	} else {
-		logger.Warn("table STICKERS created")
-	}
-	if _, err := db.NewCreateTable().Model((*entity.ChatStats)(nil)).Exec(ctx); err != nil {
-		logger.Error("failed to create table", zap.Error(err))
-	} else {
-		logger.Warn("table CHAT_STATS created")
+	for _, table := range tables {
+		if _, err := db.NewCreateTable().Model(table).Exec(ctx); err != nil {
+			logger.Error("failed to create table", zap.Error(err))
+		} else {
+			logger.Warn("table %s created", zap.String("table", fmt.Sprintf("%T", table)))
+		}
 	}
 
 	return db, nil
